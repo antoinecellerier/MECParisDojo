@@ -37,24 +37,16 @@ namespace DiceScorer
     {
         public int Score(int[] counts)
         {
-            int score = 0;
-
-            if (counts[0] >= 3)
-            {
-                score += 1000 << (counts[0] - 3);
-                counts[0] = 0;
-            }
-
-            for (int i = 2; i <= 6; ++i)
-            {
-                if (counts[i - 1] >= 3)
+            return Enumerable.Range(0, 6)
+                .Aggregate(0, (score, value) =>
                 {
-                    score += (100 * i) << (counts[i - 1] - 3);
-                    counts[i - 1] = 0;
-                }
-            }
-
-            return score;
+                    if (counts[value] >= 3)
+                    {
+                        score += (value == 0 ? 1000 : 100 * (value + 1)) << (counts[value] - 3);
+                        counts[value] = 0;
+                    }
+                    return score;
+                });
         }
     }
 
