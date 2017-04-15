@@ -6,73 +6,89 @@ using System.Threading.Tasks;
 
 namespace DiceScorer
 {
+    using static ScoreConstants;
+
+    public static class ScoreConstants
+    {
+        public static readonly int[] DiceValues = Enumerable.Range(1, 6).ToArray();
+        public static readonly int[] ZeroDice = {0, 0, 0, 0, 0, 0};
+    }
+
     interface ScoreRule
     {
-        int Score(int[] counts);
+        (int score, int[] remaining) Score(int[] counts);
     }
 
     public class SingleDieScoreRule : ScoreRule
     {
-        public int Score(int[] counts)
+        private readonly int _value;
+        private readonly int _score;
+
+        public SingleDieScoreRule(int value, int score)
+        {
+            _value = value;
+            _score = score;
+        }
+
+        public (int score, int[] remaining) Score(int[] counts)
         {
             int score = 0;
 
-            if (counts[0] == 1)
+            if (counts[_value-1] == 1)
             {
-                score += 100;
-                counts[0] = 0;
+                score += _score;
+                counts = counts.ToArray();
+                counts[_value-1] = 0;
             }
 
-            if (counts[4] == 1)
-            {
-                score += 50;
-                counts[4] = 0;
-            }
-
-            return score;
+            return (score, counts);
         }
     }
 
     class TripleAndMoreScoreDice : ScoreRule
     {
-        public int Score(int[] counts)
+        public (int score, int[] remaining) Score(int[] counts)
         {
-            return Enumerable.Range(0, 6)
+            bool cloned = false;
+            return (Enumerable.Range(0, 6)
                 .Aggregate(0, (score, value) =>
                 {
                     if (counts[value] >= 3)
                     {
                         score += (value == 0 ? 1000 : 100 * (value + 1)) << (counts[value] - 3);
+                        if (!cloned)
+                        {
+                            cloned = true;
+                            counts = counts.ToArray();
+                        }
                         counts[value] = 0;
                     }
                     return score;
-                });
+                }), counts);
         }
     }
 
     public class PairScoreRule : ScoreRule
     {
-        public int Score(int[] counts)
+        public (int score, int[] remaining) Score(int[] counts)
         {
             if (counts.Sum() == 6 && counts.All(count => count == 0 || count == 2))
             {
-                Array.Clear(counts, 0, 6);
-                return 800;
+                return (800, ZeroDice);
             }
-            return 0;
+            return (0, counts);
         }
     }
 
     public class StraightScoreRule : ScoreRule
     {
-        public int Score(int[] counts)
+        public (int score, int[] remaining) Score(int[] counts)
         {
             if (counts.All(count => count == 1))
             {
-                Array.Clear(counts, 0, 6);
-                return 1200;
+                return (1200, ZeroDice);
             }
-            return 0;
+            return (0, counts);
         }
     }
 
@@ -83,14 +99,22 @@ namespace DiceScorer
             new PairScoreRule(),
             new StraightScoreRule(),
             new TripleAndMoreScoreDice(),
-            new SingleDieScoreRule()
+            new SingleDieScoreRule(1, 100),
+            new SingleDieScoreRule(5, 50)
         };
 
         public int Score(List<int> dice)
         {
-            int[] counts = Enumerable.Range(1, 6).Select(value => dice.Count(die => die == value)).ToArray();
+            int[] originalCounts = DiceValues.Select(value => dice.Count(die => die == value)).ToArray();
 
-            return _rules.Aggregate(0, (score, rule) => score + rule.Score(counts));
+            return _rules.Aggregate<ScoreRule, (int score, int[] counts)>(
+                    (0, originalCounts),
+                    ((int score, int[] counts) _, ScoreRule rule) =>
+                    {
+                        (int score, int[] counts) = rule.Score(_.counts);
+                        return (_.score + score, counts);
+                    })
+                .score;
         }
     }
 }
