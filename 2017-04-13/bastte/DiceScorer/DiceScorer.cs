@@ -17,22 +17,21 @@ namespace DiceScorer
 
         private static Func<Counts, T> Const<T>(T value) => _ => value;
         private static readonly Func<Counts, Counts> Zero = _ => Enumerable.Repeat(0, 6).ToImmutableArray();
-        private static Func<Counts, Counts> CloneZero(int index) => _ => _.SetItem(index, 0);
+        private static Func<Counts, Counts> CloneZero(int v) => _ => _.SetItem(v, 0);
 
         private static Rule Compose(params Rule[] rules) => rules.Aggregate((f, g) => _ => g(f(_)));
 
         private static readonly Rule Rules =
             Compose(
-                Rule(c => c.Sum() == 6 && c.All(_ => _ == 0 || _ == 2), Const(800), Zero),
+                Rule(c => c.Sum() == 6 && c.All(_ => (_ & ~2) == 0), Const(800), Zero),
                 Rule(c => c.All(_ => _ == 1), Const(1200), Zero),
-                Compose(Enumerable.Range(0, 6)
-                    .Select(value =>
-                        Rule(c => c[value] >= 3,
-                            c => (value == 0 ? 1000 : 100 * (value + 1)) << (c[value] - 3),
-                            CloneZero(value))).ToArray()),
+                Compose(Enumerable.Range(0, 6).Select(v => Rule(
+                        c => c[v] >= 3,
+                        c => (100 * ((1 >> v) * 9 + v + 1)) << (c[v] - 3),
+                        CloneZero(v))).ToArray()),
                 Rule(c => c[0] == 1, Const(100), CloneZero(0)),
                 Rule(c => c[4] == 1, Const(50), CloneZero(4)));
 
-        public int Score(List<int> dice) => Rules((0, Enumerable.Range(1, 6).Select(v => dice.Count(d => d == v)).ToImmutableArray())).s;
+        public int Score(IEnumerable<int> dice) => Rules((0, Enumerable.Range(1, 6).Select(v => dice.Count(d => d == v)).ToImmutableArray())).s;
     }
 }
