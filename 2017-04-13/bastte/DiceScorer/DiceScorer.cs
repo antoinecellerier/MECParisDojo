@@ -8,28 +8,25 @@ namespace DiceScorer
 {
     interface ScoreRule
     {
-        int Score(List<int> dice);
+        int Score(int[] counts);
     }
 
     public class SingleDieScoreRule : ScoreRule
     {
-        public int Score(List<int> dice)
+        public int Score(int[] counts)
         {
             int score = 0;
 
-            int count1 = dice.Count(x => x == 1);
-            int count5 = dice.Count(x => x == 5);
-
-            if (count1 == 1)
+            if (counts[0] == 1)
             {
                 score += 100;
-                dice.Remove(1);
+                counts[0] = 0;
             }
 
-            if (count5 == 1)
+            if (counts[4] == 1)
             {
                 score += 50;
-                dice.Remove(5);
+                counts[4] = 0;
             }
 
             return score;
@@ -38,31 +35,22 @@ namespace DiceScorer
 
     class TripleAndMoreScoreDice : ScoreRule
     {
-        public int Score(List<int> dice)
+        public int Score(int[] counts)
         {
             int score = 0;
-            int count1 = dice.Count(x => x == 1);
 
-            if (count1 >= 3)
+            if (counts[0] >= 3)
             {
-                score += 1000 << (count1-3);
-                while (count1-- != 0)
-                {
-                    dice.Remove(1);
-                }
+                score += 1000 << (counts[0] - 3);
+                counts[0] = 0;
             }
 
             for (int i = 2; i <= 6; ++i)
             {
-                int count = dice.Count(x => x == i);
-                if (count >= 3)
+                if (counts[i - 1] >= 3)
                 {
-                    score += (100 * i) << (count-3);
-
-                    while (count-- != 0)
-                    {
-                        dice.Remove(i);
-                    }
+                    score += (100 * i) << (counts[i - 1] - 3);
+                    counts[i - 1] = 0;
                 }
             }
 
@@ -72,11 +60,11 @@ namespace DiceScorer
 
     public class PairScoreRule : ScoreRule
     {
-        public int Score(List<int> dice)
+        public int Score(int[] counts)
         {
-            if (dice.Count == 6 && dice.GroupBy(value => value).All(g => g.Count() == 2))
+            if (counts.Sum() == 6 && counts.All(count => count == 0 || count == 2))
             {
-                dice.Clear();
+                Array.Clear(counts, 0, 6);
                 return 800;
             }
             return 0;
@@ -85,11 +73,11 @@ namespace DiceScorer
 
     public class StraightScoreRule : ScoreRule
     {
-        public int Score(List<int> dice)
+        public int Score(int[] counts)
         {
-            if (dice.Count == 6 && dice.GroupBy(value => value).All(g => g.Count() == 1))
+            if (counts.All(count => count == 1))
             {
-                dice.Clear();
+                Array.Clear(counts, 0, 6);
                 return 1200;
             }
             return 0;
@@ -104,9 +92,11 @@ namespace DiceScorer
 
             List<ScoreRule> rules = new List<ScoreRule> { new PairScoreRule(), new StraightScoreRule(), new TripleAndMoreScoreDice(), new SingleDieScoreRule() };
 
+            int[] counts = Enumerable.Range(1, 6).Select(value => dice.Count(die => die == value)).ToArray();
+
             foreach (ScoreRule rule in rules)
             {
-                score += rule.Score(dice);
+                score += rule.Score(counts);
             }
 
             return score;
