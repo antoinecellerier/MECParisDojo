@@ -86,20 +86,19 @@ namespace DiceScorer
 
     public class DiceScorer
     {
+        private readonly List<ScoreRule> _rules = new List<ScoreRule>
+        {
+            new PairScoreRule(),
+            new StraightScoreRule(),
+            new TripleAndMoreScoreDice(),
+            new SingleDieScoreRule()
+        };
+
         public int Score(List<int> dice)
         {
-            int score = 0;
-
-            List<ScoreRule> rules = new List<ScoreRule> { new PairScoreRule(), new StraightScoreRule(), new TripleAndMoreScoreDice(), new SingleDieScoreRule() };
-
             int[] counts = Enumerable.Range(1, 6).Select(value => dice.Count(die => die == value)).ToArray();
 
-            foreach (ScoreRule rule in rules)
-            {
-                score += rule.Score(counts);
-            }
-
-            return score;
+            return _rules.Aggregate(0, (score, rule) => score + rule.Score(counts));
         }
     }
 }
