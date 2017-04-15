@@ -83,13 +83,26 @@ namespace DiceScorer
         }
     }
 
-    class DiceScorer
+    public class StraightScoreRule : ScoreRule
+    {
+        public int Score(List<int> dice)
+        {
+            if (dice.Count == 6 && dice.GroupBy(value => value).All(g => g.Count() == 1))
+            {
+                dice.Clear();
+                return 1200;
+            }
+            return 0;
+        }
+    }
+
+    public class DiceScorer
     {
         public int Score(List<int> dice)
         {
             int score = 0;
 
-            List<ScoreRule> rules = new List<ScoreRule> { new PairScoreRule(), new TripleAndMoreScoreDice(), new SingleDieScoreRule() };
+            List<ScoreRule> rules = new List<ScoreRule> { new PairScoreRule(), new StraightScoreRule(), new TripleAndMoreScoreDice(), new SingleDieScoreRule() };
 
             foreach (ScoreRule rule in rules)
             {
