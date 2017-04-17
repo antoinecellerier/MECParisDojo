@@ -13,4 +13,4 @@ type DiceScorer() =
             | [] -> 0
 
     member this.Score (dice: seq<int>) =
-        dice |> Seq.countBy id |> Seq.sortBy snd |> Seq.toList |> Rules
+        dice |> Seq.countBy id |> Seq.sortByDescending snd |> Seq.toList |> Rules
