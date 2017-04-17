@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceScorer", "DiceScorer\DiceScorer.csproj", "{9859F8A9-ACFA-4FB5-B9F3-BE12C319EADF}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DiceScorerFSharp", "DiceScorerFSharp\DiceScorerFSharp.fsproj", "{26AA575C-E02F-4FE3-B68F-C6F6E6C5AA6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiceScorerTests", "DiceScorerTests\DiceScorerTests.csproj", "{C2735425-F22B-4D1A-A2B0-0984B2C9214A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9859F8A9-ACFA-4FB5-B9F3-BE12C319EADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9859F8A9-ACFA-4FB5-B9F3-BE12C319EADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9859F8A9-ACFA-4FB5-B9F3-BE12C319EADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9859F8A9-ACFA-4FB5-B9F3-BE12C319EADF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26AA575C-E02F-4FE3-B68F-C6F6E6C5AA6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26AA575C-E02F-4FE3-B68F-C6F6E6C5AA6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26AA575C-E02F-4FE3-B68F-C6F6E6C5AA6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26AA575C-E02F-4FE3-B68F-C6F6E6C5AA6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2735425-F22B-4D1A-A2B0-0984B2C9214A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2735425-F22B-4D1A-A2B0-0984B2C9214A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2735425-F22B-4D1A-A2B0-0984B2C9214A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2735425-F22B-4D1A-A2B0-0984B2C9214A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

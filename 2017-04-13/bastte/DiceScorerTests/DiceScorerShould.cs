@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace DiceScorer
+namespace DiceScorerTests
 {
     public class DiceScorerShould
     {
@@ -26,9 +26,26 @@ namespace DiceScorer
         [InlineData(1200, new[] { 4, 2, 3, 1, 5, 6 })]
         public void CorrectlyScore(int expectedScore, int[] dice)
         {
-            var scorer = new DiceScorer();
-            int score = scorer.Score(dice.ToList());
+            var scorer = new DiceScorer.DiceScorer();
+            int score = scorer.Score(dice);
             Assert.Equal(expectedScore, score);
+        }
+
+        [Theory]
+        [MemberData(nameof(TestCases))]
+        public void CorrectlyScoreFSharp(int expectedScore, int[] dice)
+        {
+            var scorer = new DiceScorerFSharp.DiceScorer();
+            int score = scorer.Score(dice);
+            Assert.Equal(expectedScore, score);
+        }
+
+        public static IEnumerable<object[]> TestCases()
+        {
+            return typeof(DiceScorerShould).GetMethod("CorrectlyScore")
+                .GetCustomAttributes(typeof(InlineDataAttribute), false)
+                .Cast<InlineDataAttribute>()
+                .Select(a => a.GetData(null).First());
         }
     }
 }
