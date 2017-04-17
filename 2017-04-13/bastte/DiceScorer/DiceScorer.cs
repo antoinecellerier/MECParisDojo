@@ -13,7 +13,7 @@ namespace DiceScorer
     {
         private static Rule Rule(
             Predicate<Counts> condition, Func<Counts, Score> score, Func<Counts, Counts> cost)
-            => ((Score s, Counts c) _) => !condition(_.c) ? _ : (_.s + score(_.c), cost(_.c));
+            => ((Score s, Counts c) _) => condition(_.c) ? (_.s + score(_.c), cost(_.c)) : _;
 
         private static readonly Counts Zero = Enumerable.Repeat(0, 6).ToImmutableArray();
 
@@ -25,7 +25,7 @@ namespace DiceScorer
                 Rule(c => c.All(_ => _ == 1), c => 1200, c => Zero),
                 Compose(Enumerable.Range(0, 6).Select(v => Rule(
                         c => c[v] >= 3,
-                        c => (100 * ((1 >> v) * 9 + v + 1)) << (c[v] - 3),
+                        c => ((1 >> v) * 9 + v + 1) * 100 << (c[v] - 3),
                         c => c.SetItem(v, 0))).ToArray()),
                 Rule(c => c[0] == 1, c => 100, c => c.SetItem(0, 0)),
                 Rule(c => c[4] == 1, c => 50, c => c.SetItem(4, 0)));
